@@ -1,58 +1,70 @@
+---
 - name: Very Low Quality Ansible Playbook
   hosts: all
-  become: yes
+  become: true
   vars:
     db_password: mysecretpassword
   tasks:
     - name: Include non-existent tasks
-      include_tasks: nonexistent_tasks.yml
+      ansible.builtin.include_tasks: nonexistent_tasks.yml
+
     - name: Install httpd using command (non-idempotent)
-      command: yum install -y httpd
+      ansible.builtin.command: yum install -y httpd
+
     - name: Install non_existent_package
-      yum:
+      ansible.builtin.yum:
         name: non_existent_package
         state: present
+
     - name: Remove httpd
-      yum:
+      ansible.builtin.yum:
         name: httpd
         state: absent
+
     - name: Start httpd service (which is removed)
-      service:
+      ansible.builtin.service:
         name: httpd
         state: started
-        enabled: yes
+        enabled: true
+
     - name: Create directory using shell
-      shell: mkdir /tmp/newdir
+      ansible.builtin.shell: mkdir /tmp/newdir
+
     - name: Copy a file that doesn't exist
-      copy:
+      ansible.builtin.copy:
         src: /path/to/nonexistent/file
         dest: /dest/path
+
     - name: Use undefined variable
-      debug:
+      ignore_errors: true
+      ansible.builtin.debug:
         msg: "{{ undefined_variable }}"
-      ignore_errors: yes
+
     - name: Create file with password
-      copy:
+      ansible.builtin.copy:
         content: "password: {{ db_password }}"
         dest: /tmp/password.txt
+
     - name: Add line to non-existent file
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /tmp/nonexistent.conf
-        line: "some_line"
-        create: no
+        line: some_line
+        create: false
+
     - name: Clone git repo with invalid URL
-      git:
+      ansible.builtin.git:
         repo: invalid_url
         dest: /tmp/repo
+
     - name: Use raw module
-      raw: echo "Hello" > /tmp/hello.txt
+      ansible.builtin.raw: echo "Hello" > /tmp/hello.txt
 
 - name: Play without become
   hosts: all
-  become: no
+  become: false
   tasks:
     - name: Try to install package without become
-      yum:
+      ansible.builtin.yum:
         name: httpd
         state: present
 
@@ -60,4 +72,4 @@
   hosts: specific_host
   tasks:
     - name: Run a failing command
-      shell: this_command_does_not_exist
+      ansible.builtin.shell: this_command_does_not_exist
