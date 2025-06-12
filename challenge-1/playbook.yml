@@ -25,7 +25,7 @@
       check_mode: true
 
     - name: Set permissions for temporary directory
-      ansible.builtin.file:
+      file:
         path: "{{ temp_dir.path }}"
         mode: "75"
 
@@ -71,7 +71,7 @@
           - started
 
     - name: Install curl
-      ansible.builtin.package: state=present
+      package: state=present
       become: true
 
     - name: Test if web page is accessible
